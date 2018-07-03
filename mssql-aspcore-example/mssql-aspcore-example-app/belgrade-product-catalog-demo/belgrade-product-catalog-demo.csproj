@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>belgrade-product-catalog-demo</AssemblyName>
     <OutputType>Exe</OutputType>
