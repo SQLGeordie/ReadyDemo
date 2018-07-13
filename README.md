@@ -52,7 +52,7 @@ sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
 sudo docker ps
 ```
 
-![GettingStartedResults.PNG](/Media/Container-GettingStartedResults.png)
+![GettingStartedResults.PNG](./Media/Container-GettingStartedResults.png)
 
 3. Connect to SQL Server in container using SSMS or SQL Ops Studio.
 
