@@ -52,7 +52,7 @@ sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
 sudo docker ps
 ```
 
-![GettingStartedResults.PNG](/Media/Container-GettingStartedResults.PNG)
+![GettingStartedResults.PNG](/Media/Container-GettingStartedResults.png)
 
 3. Connect to SQL Server in container using SSMS or SQL Ops Studio.
 
@@ -61,8 +61,9 @@ Open SSMS or Ops studio and connect to the SQL Server in container instance by c
 ```
 <host IP>, 1500
 ```
->Note: If you are running this in an Azure VM, the host IP is the Azure VM IP. You will also need to open port 1500 external traffic.
+>Note: If you are running this in an Azure VM, the host IP is the Azure VM IP. You will also need to open port 1500 external traffic. [go here to learn how to open ports in Azure VMs](/open_azure_vm_port)
 
+![GettingStartedOpsStudio.PNG](/Media/Container-GettingStartedOpsStudio.png)
 
 3. Run SQLCMD inside the container. First run bash interactively in the container with docker execute 'bash' inside 'sql1' container. 
 
@@ -73,6 +74,8 @@ Use SQLCMD within the container to connect to SQL Server:
 ```
 /opt/mssql-tools/bin/sqlcmd -U SA -P YourStrong!Passw0rd
 ```
+![sqlcmd.PNG](/Media/Container-ExecSQLCMD.png)
+
 Exit SQLCMD and the container with exit:
 ```
 exit
@@ -116,7 +119,7 @@ See that the container no longer exists:
 ```
 sudo docker container ls
 ```
-
+![DockerCommands.PNG](/Media/Container-DockerCommands.png)
 
 > **Key Takeaway**
 >
@@ -161,13 +164,14 @@ EOF
 ```
 cat Dockerfile
 ```
-
-<insert image for contents of Dockefile>
+![dockerfile.PNG](/Media/Container-Dockerfile.png)
 
 4. Run the following to build your
 ```
 sudo docker build . -t mssql-with-backup-example
 ```
+![GettingStartedOpsStudio.PNG](/Media/Container-BuildOwnContainer.png)
+
 5. Start the container 
 ```
 sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
@@ -207,7 +211,7 @@ the output of this command should be similar to
 
 If you connect to the instance, you should see that the instance was restored.
  
-<insert image of restored database here>
+![RestoredDB.PNG](/Media/Container-RestoredDB.png)
 
 7. Clean up the container
 ```
@@ -252,9 +256,11 @@ nano docker-compose.yml
 
 3. Edit the SQL Server environment variables then save the file with `ctrl + x`
 
+![DockerCompose.PNG](/Media/Container-DockerCompose.png)
+
 4. Edit the `mssql-aspcore-example-db/db-init.sh` with the SA password that you used to  
 
-<insert images>
+![db-sh.PNG](/Media/Container-db-sh.png)
 
 4. Run the containers with docker-compose:
 ```
@@ -268,7 +274,9 @@ docker-compose up
 ```
 http:<host IP>:5000
 ```
->Note: If you are running this in an Azure VM, the host IP is the Azure VM IP. You will also need to open port 5000 external traffic.
+>Note: If you are running this in an Azure VM, the host IP is the Azure VM IP. You will also need to open port 5000 external traffic. [go here to learn how to open ports in Azure VMs](/open_azure_vm_port)
+
+![DockerComposeUp.PNG](/Media/Container-DockerComposeUp.png)
 
 To stop the docker compose application, press `ctrl + c` in the terminal. 
 To remove the containers run the following command:
