@@ -2,27 +2,27 @@
 This is built for Ready 2018 July
 
 ## Pre Lab
-1. Install docker engine by running the following
+1. Install docker engine by running the following:
 ```
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
+yum install http://mirror.centos.org/centos/7/extras/x86_64/Packages/pigz-2.3.3-1.el7.centos.x86_64.rpm
+
 sudo yum install docker-ce
  ```
 
-check status of docker engine
+check status of docker engine:
 ```
-systemctl status docker:
+sudo systemctl status docker
  ```
 
 if is not running, start it by running:
-
 ``` 
-systemctl start docker
+sudo systemctl start docker
 ```
- 
->Note: for this lab, we are installing docker for CentOS, this will work on CentOS or RHEL due to the similarity of the OS’s. For production usage on RHEL, install Docker EE for RHEL:  https://docs.docker.com/install/linux/docker-ee/rhel/.  
+>Note: for this lab, we are installing docker for CentOS, this will work on CentOS or RHEL due to the similarity of the OS’s. For production usage on RHEL, install Docker EE for RHEL: https://docs.docker.com/install/linux/docker-ee/rhel/.
  
 2. clone this repo by running the following: 
 
@@ -35,10 +35,10 @@ git clone https://github.com/vin-yu/ReadyDemo.git
 ### 1. Getting started with SQL Server in Container
 
 #### Introduction
-In this section you will run SQL Server in a container and connect to it with SSMS/Operational Studio. This is the most common way to get started with SQL Server in containers.  
+In this section you will run SQL Server in a container and connect to it with SSMS/Operational Studio. This is the easiest way to get started with SQL Server in containers.  
  
 #### Steps
-1. Run the following command in your terminal with your own password:
+1. Change the password in the command below and run it in your terminal:
 ``` 
 sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
       -p 1500:1433 --name sql1 \
@@ -47,25 +47,37 @@ sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
 
 > Note: By default, the password must be at least 8 characters long and contain characters from three of the following four sets: Uppercase letters, Lowercase letters, Base 10 digits, and Symbols.
  
-2. Connect to SQL Server in container using SSMS or SQL Ops Studio.
+2. Check that SQL Server is running:
+```
+sudo docker ps
+```
+
+![GettingStartedResults.PNG](../../Media/Container-GettingStartedResults.png)
+
+3. Connect to SQL Server in container using SSMS or SQL Ops Studio.
 
 Open SSMS or Ops studio and connect to the SQL Server in container instance by connecting host:
 
 ```
-http:<host IP>:1500
+<host IP>, 1500
 ```
 >Note: If you are running this in an Azure VM, the host IP is the Azure VM IP. You will also need to open port 1500 external traffic.
 
 
-3. Run SQLCMD inside the container
+3. Run SQLCMD inside the container. First run bash interactively in the container with docker execute 'bash' inside 'sql1' container. 
 
 ```
-# docker execute command 'bash' inside 'sql1' container 
-docker exec -it bash sql1
-
+sudo docker exec -it sql1 bash
+```
+Use SQLCMD within the container to connect to SQL Server:
+```
 /opt/mssql-tools/bin/sqlcmd -U SA -P YourStrong!Passw0rd
-
 ```
+Exit SQLCMD and the container with exit:
+```
+exit
+```
+
 
 > **Key Takeaway**
 > 
@@ -84,10 +96,6 @@ See the active container instances:
 ```
 sudo docker ps
 ```
-List all the container instances:
-```
-sudo docker ps -a
-```
 List all container images:
 ```
 sudo docker image ls
@@ -96,7 +104,7 @@ Stop the SQL Server container:
 ```
 sudo docker stop sql1
 ```
-See that `sql1` is no longer running: 
+See that `sql1` is no longer running by listing all containers: 
 ```
 sudo docker ps -a
 ```
@@ -158,7 +166,7 @@ cat Dockerfile
 
 4. Run the following to build your
 ```
-docker build . -t mssql-with-backup-example
+sudo docker build . -t mssql-with-backup-example
 ```
 5. Start the container 
 ```
@@ -166,6 +174,11 @@ sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
       -p 1500:1433 --name sql2 \
       -d mssql-with-backup-example
 ```
+the output of this command should be similar to this:
+>LogicalName PhysicalName
+>----------- ------------
+>ProductCatalog /var/opt/mssql/data/ProductCatalog.mdf
+>ProductCatalog_log /var/opt/mssql/data/ProductCatalog_log.ldf
 
 6. View the contents of the backup file built in the image:
 
@@ -176,6 +189,13 @@ sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
    -W \
    | tr -s ' ' | cut -d ' ' -f 1-2
 ```
+the output of this command should be similar to 
+
+>Processed 384 pages for database 'ProductCatalog', file  'ProductCatalog' on file 1.
+>
+>Processed 8 pages for database 'ProductCatalog', file 'ProductCatalog_log' on file 1.
+>
+>RESTORE DATABASE successfully processed 392 pages in 0.278 seconds (11.016 MB/sec).
 
 6. Restore the backup:
 ```
@@ -185,9 +205,16 @@ sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
 
 ```
 
-if you connect to the instance, you should see that the instance was restored.
-
+If you connect to the instance, you should see that the instance was restored.
+ 
 <insert image of restored database here>
+
+7. Clean up the container
+```
+sudo docker stop sql2
+sudo docker container rm sql2
+```
+
 
 > **Key Takeaway**
 >
@@ -204,7 +231,15 @@ Most applications involve multiple containers.
 
 #### Steps
 
-1. change directory to the mssql-aspcore-example
+1. Install docker-compose:
+```
+sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+
+1. Change directory to the mssql-aspcore-example
 
 ```
 cd <path to git folder>/mssql-aspcore-example 
@@ -216,6 +251,8 @@ nano docker-compose.yml
 ```
 
 3. Edit the SQL Server environment variables then save the file with `ctrl + x`
+
+4. Edit the `mssql-aspcore-example-db/db-init.sh` with the SA password that you used to  
 
 <insert images>
 
